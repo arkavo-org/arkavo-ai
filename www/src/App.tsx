@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, KeyboardEvent } from 'react';
 import logo from './assets/arkavo.svg';
 import './App.css'
 
@@ -7,6 +7,8 @@ function App() {
     const [responses, setResponses] = useState<string[]>([]);
 
     const handleSubmit = async () => {
+        if (!prompt.trim()) return; // Prevent empty submissions
+
         setResponses([]); // Clear previous responses when a new prompt is submitted
 
         const jsonData = {
@@ -63,17 +65,26 @@ function App() {
         }
     };
 
+    const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit();
+        }
+    };
+
     return (
         <>
-            <h1>Arkavo AI</h1>
             <img src={logo} className="logo" alt="Arkavo logo"/>
+            <h1>Arkavo AI</h1>
             <div>
-                <input
-                    type="text"
+                <textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     placeholder="Enter your prompt"
+                    rows={3}
                 />
+                <br/><br/>
                 <button onClick={handleSubmit}>Send</button>
             </div>
             <div>
