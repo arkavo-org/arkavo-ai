@@ -1,7 +1,12 @@
 /* App.css */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
 
 .app-container {
     display: flex;
     height: 100vh;
-    overflow: hidden; /* Prevent overflow issues */
+    width: 100vw; /* Ensures it takes the full width of the viewport */
 }

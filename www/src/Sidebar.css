@@ -3,7 +3,7 @@
     background-color: #f4f4f4;
     padding: 20px;
     border-right: 1px solid #ddd;
-    height: 100vh;
+    height: auto;
     position: relative; /* Remove fixed positioning */
     overflow-y: auto;
     display: flex;
