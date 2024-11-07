@@ -1,0 +1,40 @@
+/* src/Navbar.css */
+@import url("global.css");
+
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 80%;
+    background-color: var(--arkavo-orange);
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: left;
+    padding: 15px 20px;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.navbar.show {
+    transform: translateY(0);
+}
+
+.navbar.hide {
+    transform: translateY(-100%);
+}
+
+.navbar-logo {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.navbar-links a {
+    font-size: 1.5em;
+    color: #ffffff;
+    text-decoration: none;
+    align-items: right;
+}
+
+.navbar-links a:hover {
+    text-decoration: underline;
+}
