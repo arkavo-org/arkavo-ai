@@ -4,13 +4,14 @@
 .navbar {
     position: fixed;
     top: 0;
-    width: 80%;
-    background-color: var(--arkavo-orange);
+    width: 100%;
+    background-color: var(--arkavo-dark-orange);
     color: #ffffff;
     display: flex;
     justify-content: space-between;
     align-items: left;
     padding: 15px 20px;
+    box-sizing: border-box;
     transition: transform 0.3s ease;
     z-index: 1000;
 }
@@ -37,4 +38,11 @@
 
 .navbar-links a:hover {
     text-decoration: underline;
+}
+
+.profile-picture {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-left: 10px;
 }
