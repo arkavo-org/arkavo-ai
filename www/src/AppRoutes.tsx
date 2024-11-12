@@ -7,6 +7,7 @@ import Callback from './callback'; // Ensure this is imported correctly
 import SignIn from './SignIn';
 import Privacy from './Privacy'; // Import Privacy component
 import Profile from './Profile'; // Import Privacy component
+import ChatPage from './ChatPage'; // Import Privacy component
 
 const AppRoutes: React.FC = () => {
     return (
@@ -18,6 +19,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="/privacy" element={<Privacy />} /> {/* Privacy page route */}
                 <Route path="/callback" element={<Callback />} />  {/* Ensure this route exists */}
                 <Route path="/profile" element={<Profile />} />  {/* Ensure this route exists */}
+                <Route path="/chat" element={<ChatPage />} />  {/* Ensure this route exists */}
             </Routes>
         </>
     );

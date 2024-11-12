@@ -142,4 +142,4 @@ function ChatPage() {
     );
 }
 
-export default App;
+export default ChatPage;

@@ -6,6 +6,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: var(--arkavo-gray);
     color: var(--arkavo-dark);
+    padding-top: 64px; /* Adjust height to match navbar */
 }
 
 h1 {

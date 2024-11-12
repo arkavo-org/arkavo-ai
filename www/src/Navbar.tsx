@@ -55,6 +55,11 @@ const Navbar: React.FC = () => {
     setShowDropdown(false);
   };
 
+  // Navigate to the chat page
+  const handleDMClick = () => {
+    navigate('/chat');
+  };
+
   return (
     <nav className={`navbar ${showNavbar ? 'show' : 'hide'}`}>
       <div className="navbar-logo">
@@ -64,7 +69,12 @@ const Navbar: React.FC = () => {
         {userProfile ? (
           <div className="profile-container">
             <FontAwesomeIcon icon={faBell} className="icon notification-icon" title="Notifications" />
-            <FontAwesomeIcon icon={faEnvelope} className="icon dm-icon" title="Direct Messages" />
+            <FontAwesomeIcon 
+              icon={faEnvelope} 
+              className="icon dm-icon" 
+              title="Direct Messages" 
+              onClick={handleDMClick} 
+            />
             <img
               src={userProfile.picture}
               alt="Profile"

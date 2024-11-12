@@ -14,7 +14,7 @@ export const Chat: React.FC<ChatProps> = ({
     setPrompt,
     handleSubmit,
     handleKeyDown,
-    conversations
+    conversations = []
 }) => {
     return (
         <main className="chat-container">

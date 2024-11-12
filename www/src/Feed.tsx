@@ -1,6 +1,7 @@
 // src/Feed.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './Feed.css';
 
 interface FeedItem {
     title: string;
@@ -44,7 +45,7 @@ const Feed: React.FC = () => {
     const alternateItems = (arr1: FeedItem[], arr2: FeedItem[]): FeedItem[] => {
         const result: FeedItem[] = [];
         const maxLength = Math.max(arr1.length, arr2.length);
-        
+
         for (let i = 0; i < maxLength; i++) {
             if (i < arr1.length) result.push(arr1[i]);
             if (i < arr2.length) result.push(arr2[i]);
@@ -82,7 +83,7 @@ const Feed: React.FC = () => {
     }, [feedItems, loading]);
 
     return (
-        <div style={{ paddingTop: "80px", padding: "20px", maxWidth: "800px", margin: "0 auto", height: "100%", boxSizing:"border-box" }}>
+        <div className="feed-container">
             {displayedItems.map((item, index) => (
                 <div key={index} className="feed-item">
                     <h2>{item.title}</h2>
