@@ -1,10 +1,6 @@
-// src/App.tsx
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import './App.css';
+import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import AppRoutes from './AppRoutes';
-import { userManager } from './authConfig';
 
 const App: React.FC = () => {
     return (

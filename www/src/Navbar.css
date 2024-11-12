@@ -9,7 +9,7 @@
     color: #ffffff;
     display: flex;
     justify-content: space-between;
-    align-items: left;
+    align-items: center;
     padding: 15px 20px;
     box-sizing: border-box;
     transition: transform 0.3s ease;
@@ -24,25 +24,68 @@
     transform: translateY(-100%);
 }
 
-.navbar-logo {
+.navbar-logo .home-link {
     font-size: 1.5em;
     font-weight: bold;
-}
-
-.navbar-links a {
-    font-size: 1.5em;
     color: #ffffff;
     text-decoration: none;
-    align-items: right;
+    font-family: 'Poppins', sans-serif; /* Add a modern font */
 }
 
-.navbar-links a:hover {
+.navbar-logo .home-link:hover {
+    color: #f5f5f5; /* Slightly lighter color on hover */
     text-decoration: underline;
 }
 
+.navbar-links {
+    display: flex;
+    align-items: center;
+}
+
+.profile-container {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Add spacing between icons and profile picture */
+}
+
+.icon {
+    font-size: 1.5em;
+    color: #ffffff;
+}
+
+.notification-icon, .dm-icon {
+    margin-right: 10px; /* Space between icons if needed */
+}
+
 .profile-picture {
-    width: 32px;
-    height: 32px;
+    cursor: pointer;
     border-radius: 50%;
-    margin-left: 10px;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-menu button {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dropdown-menu button:hover {
+    background-color: #f0f0f0;
 }
