@@ -1,10 +1,9 @@
 .sidebar {
-    width: 30%;
+    flex-basis: 30%; /* Set width to 30% */
     background-color: #f4f4f4;
     padding: 20px;
     border-right: 1px solid #ddd;
     height: auto;
-    position: relative; /* Remove fixed positioning */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -22,15 +21,19 @@
 }
 
 .sidebar ul {
+    width: 100%; /* Set width to 30% */
     list-style-type: none;
     padding: 0;
-    width: auto;
 }
 
 .sidebar li {
+    flex-basis: 100%; /* Set width to 30% */
     padding: 10px;
     cursor: pointer;
     border-radius: 4px;
+    font-size: 2em;
+    text-wrap: nowrap;
+    overflow-x: hidden;
     margin-bottom: 5px;
     display: flex;
     align-items: center;

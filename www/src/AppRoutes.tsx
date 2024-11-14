@@ -8,20 +8,21 @@ import SignIn from './SignIn';
 import Privacy from './Privacy'; // Import Privacy component
 import Profile from './Profile'; // Import Privacy component
 import ChatPage from './ChatPage'; // Import Privacy component
+import './App.css';
 
 const AppRoutes: React.FC = () => {
     return (
-        <>
+        <div id="fullpage">
             <Navbar />
             <Routes>
                 <Route path="/" element={<Feed />} /> {/* Home route for the feed */}
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/privacy" element={<Privacy />} /> {/* Privacy page route */}
-                <Route path="/callback" element={<Callback />} />  {/* Ensure this route exists */}
-                <Route path="/profile" element={<Profile />} />  {/* Ensure this route exists */}
-                <Route path="/chat" element={<ChatPage />} />  {/* Ensure this route exists */}
+                <Route path="/callback" element={<Callback />} />  
+                <Route path="/profile" element={<Profile />} />  
+                <Route path="/chat" element={<ChatPage />} />  
             </Routes>
-        </>
+        </div>
     );
 };
 

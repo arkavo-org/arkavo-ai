@@ -18,7 +18,6 @@ export const Chat: React.FC<ChatProps> = ({
 }) => {
     return (
         <main className="chat-container">
-            <h1>Arkavo AI</h1>
             <div className="chat-box">
                 <div className="responses-container">
                     {conversations.map((response, index) => (

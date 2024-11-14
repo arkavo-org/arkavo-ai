@@ -1,5 +1,5 @@
 // src/Feed.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import './Feed.css';
 
@@ -19,6 +19,7 @@ const Feed: React.FC = () => {
     const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
     const [displayedItems, setDisplayedItems] = useState<FeedItem[]>([]);
     const [loading, setLoading] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchFeedItems = async () => {
@@ -61,7 +62,7 @@ const Feed: React.FC = () => {
     };
 
     const loadMoreItems = () => {
-        if (loading) return;
+        if (loading || displayedItems.length >= feedItems.length) return;
         setLoading(true);
         setTimeout(() => {
             setDisplayedItems(prevItems => [
@@ -74,27 +75,35 @@ const Feed: React.FC = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.innerHeight + document.documentElement.scrollTop + 50 >= document.documentElement.offsetHeight) {
+            if (
+                containerRef.current &&
+                containerRef.current.scrollTop + containerRef.current.clientHeight >= containerRef.current.scrollHeight - 10
+            ) {
                 loadMoreItems();
             }
         };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+
+        const currentContainer = containerRef.current;
+        currentContainer?.addEventListener("scroll", handleScroll);
+
+        return () => currentContainer?.removeEventListener("scroll", handleScroll);
     }, [feedItems, loading]);
 
     return (
-        <div className="feed-container">
-            {displayedItems.map((item, index) => (
-                <div key={index} className="feed-item">
-                    <h2>{item.title}</h2>
-                    <p>{item.description}</p>
-                    <p className="meta"><strong>Category:</strong> {item.category}</p>
-                    <p className="meta"><strong>Date:</strong> {item.date}</p>
-                    <p className="meta"><strong>Author:</strong> {item.author}</p>
-                    <a href={item.link} target="_blank" rel="noopener noreferrer">Read more</a>
-                </div>
-            ))}
-            {loading && <p>Loading more items...</p>}
+        <div className="feed-container-outer" ref={containerRef}>
+            <div className="feed-container">
+                {displayedItems.map((item, index) => (
+                    <div key={index} className="feed-item">
+                        <h2>{item.title}</h2>
+                        <p>{item.description}</p>
+                        <p className="meta"><strong>Category:</strong> {item.category}</p>
+                        <p className="meta"><strong>Date:</strong> {item.date}</p>
+                        <p className="meta"><strong>Author:</strong> {item.author}</p>
+                        <a href={item.link} target="_blank" rel="noopener noreferrer">Read more</a>
+                    </div>
+                ))}
+                {loading && <p>Loading more items...</p>}
+            </div>
         </div>
     );
 };

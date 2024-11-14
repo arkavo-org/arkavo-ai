@@ -4,6 +4,7 @@ import './Navbar.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import logo from './assets/arkavo.svg';
 
 const Navbar: React.FC = () => {
   const [showNavbar, setShowNavbar] = useState(true);
@@ -62,18 +63,21 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className={`navbar ${showNavbar ? 'show' : 'hide'}`}>
-      <div className="navbar-logo">
-        <a href="/" className="home-link">Arkavo</a>
+      <div className="logo-container">
+        <img src={logo} className="icon" alt="Arkavo logo" />
+        <div className="navbar-logo">
+          <a href="/" className="home-link">Arkavo</a>
+        </div>
       </div>
       <div className="navbar-links">
         {userProfile ? (
           <div className="profile-container">
             <FontAwesomeIcon icon={faBell} className="icon notification-icon" title="Notifications" />
-            <FontAwesomeIcon 
-              icon={faEnvelope} 
-              className="icon dm-icon" 
-              title="Direct Messages" 
-              onClick={handleDMClick} 
+            <FontAwesomeIcon
+              icon={faEnvelope}
+              className="icon dm-icon"
+              title="Direct Messages"
+              onClick={handleDMClick}
             />
             <img
               src={userProfile.picture}

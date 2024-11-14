@@ -1,15 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import AppRoutes from './AppRoutes';
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 
-const App: React.FC = () => {
-    return (
+createRoot(document.getElementById('root')!).render(
+    <StrictMode>
         <Router>
-            <div style={{ width: "100vw" }}>
-                <AppRoutes />
-            </div>
+            <AppRoutes />
         </Router>
-    );
-};
+    </StrictMode>,
+  )
 
 export default App;

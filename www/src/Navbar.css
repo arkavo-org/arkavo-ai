@@ -10,9 +10,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 5px 5px;
     box-sizing: border-box;
     transition: transform 0.3s ease;
+    height: 70px;
     z-index: 1000;
 }
 
@@ -42,6 +43,14 @@
     align-items: center;
 }
 
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    font-size: 2.3em;
+    gap: 15px; /* Add spacing between icons and profile picture */
+}
+
 .profile-container {
     display: flex;
     align-items: center;
@@ -50,7 +59,25 @@
 
 .icon {
     font-size: 1.5em;
-    color: #ffffff;
+    color: #ffffff; /* Default icon color */
+    transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+    border-radius: 50%;
+    padding: 8px;
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+}
+
+/* Hover effect: white background with orange drop shadow */
+.icon:hover {
+    background-color: #ffffff; /* White background on hover */
+    color: var(--arkavo-dark-orange); /* Change icon color to match theme */
+}
+
+/* Pressed appearance when icon is active or selected */
+.icon:active {
+    background-color: #e6e6e6; /* Light gray background when pressed */
+    transform: scale(0.95); /* Slightly smaller scale for pressed effect */
 }
 
 .notification-icon, .dm-icon {

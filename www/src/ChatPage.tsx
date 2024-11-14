@@ -5,8 +5,8 @@ import { Chat } from './Chat.tsx';
 
 function ChatPage() {
     const [prompt, setPrompt] = useState('');
-    const [selectedPerson, setSelectedPerson] = useState('Llama'); // Default selection
-    const [conversations, setConversations] = useState<{ [key: string]: string[] }>({
+    const [selectedPerson, setSelectedPerson] = useState('Llama');
+    const [conversations, setConversations] = useState({
         Llama: [],
         'Sigmund Freud': [],
         'Bill Burns CIA': [],
@@ -17,6 +17,7 @@ function ChatPage() {
         'Stephen Hawking': [],
         'Isaac Newton': []
     });
+    const [showChat, setShowChat] = useState(false); // Controls view on mobile
 
     const people = [
         'Llama',
@@ -31,26 +32,21 @@ function ChatPage() {
     ];
     
     const handleSubmit = async () => {
-        if (!prompt.trim()) return; // Prevent empty submissions
+        if (!prompt.trim()) return;
 
-    
-        // Add user's prompt to the conversation
         setConversations(prevConversations => ({
             ...prevConversations,
             [selectedPerson]: [...prevConversations[selectedPerson], `You: ${prompt}`]
         }));
-    
-        // Build the context from the current conversation for the selected person
+
         const context = conversations[selectedPerson].join('\n');
-    
         const jsonData = {
             model: "llama3.2",
-            prompt: `${context}\nYou: ${prompt}`, // Add the entire conversation as context, followed by the new prompt
+            prompt: `${context}\nYou: ${prompt}`,
         };
 
-        // Clear the prompt after submission
         setPrompt('');
-    
+
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: {
@@ -58,44 +54,36 @@ function ChatPage() {
             },
             body: JSON.stringify(jsonData),
         });
-    
+
         if (!response.body) {
             console.error('No response body');
             return;
         }
-    
+
         const reader = response.body.getReader();
         const decoder = new TextDecoder('utf-8');
         let buffer = '';
-    
-        // Start an AI response placeholder in the conversation
         let aiResponse = '';
         setConversations(prevConversations => ({
             ...prevConversations,
             [selectedPerson]: [...prevConversations[selectedPerson], `AI: `]
         }));
-    
+
         while (true) {
             const { value, done } = await reader.read();
             if (done) break;
-    
-            // Decode the stream chunk as UTF-8 text
+
             buffer += decoder.decode(value, { stream: true });
-    
-            // Process each line in the stream
             let endOfLineIndex;
             while ((endOfLineIndex = buffer.indexOf('\n')) >= 0) {
                 const line = buffer.slice(0, endOfLineIndex);
                 buffer = buffer.slice(endOfLineIndex + 1);
-    
+
                 if (line.trim()) {
                     try {
-                        const parsedLine = JSON.parse(line); // Parse the JSON response
-    
-                        // Append the new portion of the response to the current AI message
+                        const parsedLine = JSON.parse(line);
                         aiResponse += parsedLine.response;
-    
-                        // Update the AI's response in real time
+
                         setConversations(prevConversations => {
                             const updatedConversation = [...prevConversations[selectedPerson]];
                             updatedConversation[updatedConversation.length - 1] = `AI: ${aiResponse}`;
@@ -111,8 +99,7 @@ function ChatPage() {
             }
         }
     };
-    
-    
+
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -121,23 +108,47 @@ function ChatPage() {
     };
 
     const handlePersonSelect = (person: string) => {
-        setSelectedPerson(person); // Update the selected person
+        setSelectedPerson(person);
+        setShowChat(true); // Switch to chat view on mobile
     };
 
+    // Determine whether the screen size is mobile
+    const isMobile = window.innerWidth <= 768;
+
     return (
-        <div className="app-container">
-            <Sidebar
-                people={people}
-                selectedPerson={selectedPerson}
-                onPersonSelect={handlePersonSelect}
-            />
-            <Chat
-                prompt={prompt}
-                setPrompt={setPrompt}
-                handleSubmit={handleSubmit}
-                handleKeyDown={handleKeyDown}
-                conversations={conversations[selectedPerson]}
-            />
+        <div id="app-container">
+            {(!isMobile || !showChat) && (
+                <Sidebar
+                    people={people}
+                    selectedPerson={selectedPerson}
+                    onPersonSelect={handlePersonSelect}
+                    className={`sidebar ${!isMobile || !showChat ? 'active' : ''}`}
+                />
+            )}
+            {(isMobile && showChat) && (
+                <div className="chat-window active">
+                    <div className="back-button" onClick={() => setShowChat(false)}>
+                        ← Back
+                    </div>
+                    <Chat
+                        prompt={prompt}
+                        setPrompt={setPrompt}
+                        handleSubmit={handleSubmit}
+                        handleKeyDown={handleKeyDown}
+                        conversations={conversations[selectedPerson]}
+                    />
+                </div>
+            )}
+            {!isMobile && (
+                <Chat
+                    prompt={prompt}
+                    setPrompt={setPrompt}
+                    handleSubmit={handleSubmit}
+                    handleKeyDown={handleKeyDown}
+                    conversations={conversations[selectedPerson]}
+                    className="chat-window"
+                />
+            )}
         </div>
     );
 }

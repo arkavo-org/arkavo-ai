@@ -1,12 +1,54 @@
-/* App.css */
+/* ChatPage.css */
+@import url("global.css");
+
 html, body {
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    overflow-x: hidden;
+    overflow-y: hidden;
+    height: 100%;
 }
 
-.app-container {
+#app-container {
     display: flex;
-    width: 100vw; /* Ensures it takes the full width of the viewport */
-    padding-top: 64px; /* Adjust height to match navbar */
+    flex-direction: row;
+    width: 100vw;
+    height: 100%;
+    padding-top: 64px;
+}
+
+/* Hide back button on larger screens */
+.back-button {
+    display: none;
+}
+
+.sidebar,
+.chat-window {
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    #app-container {
+        flex-direction: column;
+    }
+
+    /* Only show one section at a time on mobile */
+    .sidebar,
+    .chat-window {
+        display: none;
+    }
+
+    .sidebar.active,
+    .chat-window.active {
+        display: block;
+    }
+
+    /* Show back button on smaller screens */
+    .back-button {
+        display: inline-block;
+        padding: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        color: #007bff;
+    }
 }

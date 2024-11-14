@@ -1,6 +1,6 @@
 // src/Callback.tsx
 import React, { useEffect } from 'react';
-import { googleConfig, githubConfig } from './env';
+import { googleConfig, githubConfig } from '/home/julian/.secrets/env';
 import axios from 'axios';
 
 function Callback() {
@@ -43,6 +43,9 @@ function Callback() {
                 const { id_token, access_token } = response.data;
                 const userProfile = decodeJwt(id_token);
                 localStorage.setItem('userProfile', JSON.stringify(userProfile));
+                if (userProfile.picture) {
+                    console.log('Profile Picture URL:', userProfile.picture); // Log the specific picture URL
+                }
                 console.log('Google User profile saved to localStorage');
 
             } else if (provider === 'github') {

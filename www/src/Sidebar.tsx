@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './assets/arkavo.svg';
 import dummyImage from './assets/dummy-image.jpg'; // Import a dummy image
 import './Sidebar.css';
 
@@ -12,8 +11,6 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ people, selectedPerson, onPersonSelect }) => {
     return (
         <aside className="sidebar">
-            <img src={logo} className="sidebar-logo" alt="Arkavo logo" />
-            <h2>Chat With</h2>
             <ul>
                 {people.map(person => (
                     <li
