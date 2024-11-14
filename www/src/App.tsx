@@ -11,5 +11,3 @@ createRoot(document.getElementById('root')!).render(
         </Router>
     </StrictMode>,
   )
-
-export default App;

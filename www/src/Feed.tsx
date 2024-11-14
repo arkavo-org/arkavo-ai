@@ -2,22 +2,24 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import './Feed.css';
+import FeedItem from './FeedItem';
 
-interface FeedItem {
+interface FeedItemData {
     title: string;
     description: string;
     category: string;
     date: string;
     author: string;
     link: string;
+    type: string;
     likes?: number;
     replies?: number;
     comments?: number;
 }
 
 const Feed: React.FC = () => {
-    const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
-    const [displayedItems, setDisplayedItems] = useState<FeedItem[]>([]);
+    const [feedItems, setFeedItems] = useState<FeedItemData[]>([]);
+    const [displayedItems, setDisplayedItems] = useState<FeedItemData[]>([]);
     const [loading, setLoading] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -29,8 +31,15 @@ const Feed: React.FC = () => {
                     axios.get('/ipsum/threads.json')
                 ]);
 
-                const eventsData: FeedItem[] = eventsRes.data;
-                const threadsData: FeedItem[] = threadsRes.data;
+                const eventsData: FeedItemData[] = eventsRes.data.map((item: FeedItemData) => ({
+                    ...item,
+                    type: 'event'
+                }));
+
+                const threadsData: FeedItemData[] = threadsRes.data.map((item: FeedItemData) => ({
+                    ...item,
+                    type: 'thread'
+                }));
 
                 const combinedData = alternateItems(eventsData, threadsData);
                 setFeedItems(shuffleArray(combinedData));
@@ -43,8 +52,8 @@ const Feed: React.FC = () => {
         fetchFeedItems();
     }, []);
 
-    const alternateItems = (arr1: FeedItem[], arr2: FeedItem[]): FeedItem[] => {
-        const result: FeedItem[] = [];
+    const alternateItems = (arr1: FeedItemData[], arr2: FeedItemData[]): FeedItemData[] => {
+        const result: FeedItemData[] = [];
         const maxLength = Math.max(arr1.length, arr2.length);
 
         for (let i = 0; i < maxLength; i++) {
@@ -54,7 +63,7 @@ const Feed: React.FC = () => {
         return result;
     };
 
-    const shuffleArray = (array: FeedItem[]): FeedItem[] => {
+    const shuffleArray = (array: FeedItemData[]): FeedItemData[] => {
         return array
             .map(item => ({ ...item, sort: Math.random() }))
             .sort((a, b) => a.sort - b.sort)
@@ -93,14 +102,7 @@ const Feed: React.FC = () => {
         <div className="feed-container-outer" ref={containerRef}>
             <div className="feed-container">
                 {displayedItems.map((item, index) => (
-                    <div key={index} className="feed-item">
-                        <h2>{item.title}</h2>
-                        <p>{item.description}</p>
-                        <p className="meta"><strong>Category:</strong> {item.category}</p>
-                        <p className="meta"><strong>Date:</strong> {item.date}</p>
-                        <p className="meta"><strong>Author:</strong> {item.author}</p>
-                        <a href={item.link} target="_blank" rel="noopener noreferrer">Read more</a>
-                    </div>
+                    <FeedItem key={index} item={item} />
                 ))}
                 {loading && <p>Loading more items...</p>}
             </div>

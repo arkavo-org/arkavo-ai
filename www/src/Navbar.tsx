@@ -49,6 +49,12 @@ const Navbar: React.FC = () => {
     setShowDropdown(false);
   };
 
+  // Navigate to the profile page and close the dropdown
+  const handleSettings = () => {
+    navigate('/settings');
+    setShowDropdown(false);
+  };
+  
   // Handle logout, clear user profile, and close dropdown
   const handleLogout = () => {
     localStorage.removeItem('userProfile');
@@ -88,6 +94,7 @@ const Navbar: React.FC = () => {
             {showDropdown && (
               <div className="dropdown-menu">
                 <button onClick={handleViewProfile}>View Profile</button>
+                <button onClick={handleSettings}>Settings</button>
                 <button onClick={handleLogout}>Logout</button>
               </div>
             )}
