@@ -1,6 +1,6 @@
 // src/Callback.tsx
 import React, { useEffect } from 'react';
-import { googleConfig, githubConfig } from '/home/julian/.secrets/env';
+import { googleConfig, githubConfig } from '/.secrets/env';
 import axios from 'axios';
 
 function Callback() {
@@ -25,59 +25,35 @@ function Callback() {
 
     const exchangeCodeForTokens = async (code: string, codeVerifier: string, provider: 'google' | 'github') => {
         try {
+            var activeConfig;
             if (provider === 'google') {
+                activeConfig = googleConfig;
                 console.log('Starting token exchange with Google API...');
-                
-                const params = new URLSearchParams();
-                params.append('client_id', googleConfig.clientId);
-                params.append('client_secret', googleConfig.clientSecret);
-                params.append('code', code);
-                params.append('redirect_uri', googleConfig.redirectUri);
-                params.append('grant_type', 'authorization_code');
-                params.append('code_verifier', codeVerifier);
-
-                const response = await axios.post(googleConfig.tokenEndpoint, params, {
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                });
-
-                const { id_token, access_token } = response.data;
-                const userProfile = decodeJwt(id_token);
-                localStorage.setItem('userProfile', JSON.stringify(userProfile));
-                if (userProfile.picture) {
-                    console.log('Profile Picture URL:', userProfile.picture); // Log the specific picture URL
-                }
-                console.log('Google User profile saved to localStorage');
-
             } else if (provider === 'github') {
+                activeConfig = githubConfig;
                 console.log('Starting token exchange with GitHub API...');
-                
-                const params = new URLSearchParams();
-                params.append('client_id', githubConfig.clientId);
-                params.append('client_secret', githubConfig.clientSecret);
-                params.append('code', code);
-                params.append('redirect_uri', githubConfig.redirectUri);
-                params.append('code_verifier', codeVerifier);
 
-                const response = await axios.post(githubConfig.tokenEndpoint, params, {
-                    headers: { 
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        Accept: 'application/json' // GitHub requires this header
-                    },
-                });
+            };
 
-                const { access_token } = response.data;
-                
-                // Fetch GitHub user profile using the access token
-                const profileResponse = await axios.get('https://api.github.com/user', {
-                    headers: {
-                        Authorization: `Bearer ${access_token}`,
-                    },
-                });
-                
-                const userProfile = profileResponse.data;
-                localStorage.setItem('userProfile', JSON.stringify(userProfile));
-                console.log('GitHub User profile saved to localStorage');
+            const params = new URLSearchParams();
+            params.append('client_id', activeConfig.clientId);
+            params.append('client_secret', activeConfig.clientSecret);
+            params.append('code', code);
+            params.append('redirect_uri', activeConfig.redirectUri);
+            params.append('grant_type', 'authorization_code');
+            params.append('code_verifier', codeVerifier);
+
+            const response = await axios.post(activeConfig.tokenEndpoint, params, {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            });
+
+            const { id_token, access_token } = response.data;
+            const userProfile = decodeJwt(id_token);
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            if (userProfile.picture) {
+                console.log('Profile Picture URL:', userProfile.picture); // Log the specific picture URL
             }
+            console.log('User profile saved to localStorage');
 
             window.location.href = '/';  // Redirect to home page
         } catch (error) {

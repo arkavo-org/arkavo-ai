@@ -1,7 +1,7 @@
 // src/SignIn.tsx
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { googleConfig, githubConfig } from './env';
+import { googleConfig, githubConfig } from '/.secrets/env';
 import { generateCodeVerifier, generateCodeChallenge } from './pkceUtils';
 import './SignIn.css';
 

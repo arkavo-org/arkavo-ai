@@ -1,9 +1,8 @@
-// src/Navbar.tsx
 import React, { useState, useEffect } from 'react';
 import './Navbar.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faEnvelope, faSearch, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import logo from './assets/arkavo.svg';
 
 const Navbar: React.FC = () => {
@@ -11,9 +10,9 @@ const Navbar: React.FC = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [userProfile, setUserProfile] = useState<{ name: string; picture: string } | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
-  // Scroll event to show/hide navbar based on scroll direction
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -25,7 +24,6 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  // Load profile information from local storage on component mount
   useEffect(() => {
     const storedProfile = localStorage.getItem('userProfile');
     if (storedProfile) {
@@ -33,38 +31,57 @@ const Navbar: React.FC = () => {
     }
   }, []);
 
-  // Toggle dropdown menu visibility
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!event.target.closest('.profile-container')) {
+        setShowDropdown(false);
+      }
+    };
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
+
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
 
-  // Navigate to the sign-in page
   const handleSignIn = () => {
     navigate('/signin');
   };
 
-  // Navigate to the profile page and close the dropdown
   const handleViewProfile = () => {
     navigate('/profile');
     setShowDropdown(false);
   };
 
-  // Navigate to the profile page and close the dropdown
   const handleSettings = () => {
     navigate('/settings');
     setShowDropdown(false);
   };
-  
-  // Handle logout, clear user profile, and close dropdown
+
   const handleLogout = () => {
     localStorage.removeItem('userProfile');
     setUserProfile(null);
     setShowDropdown(false);
   };
 
-  // Navigate to the chat page
   const handleDMClick = () => {
     navigate('/chat');
+  };
+
+  const handleEventsClick = () => {
+    navigate('/events');
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
   };
 
   return (
@@ -75,9 +92,24 @@ const Navbar: React.FC = () => {
           <a href="/" className="home-link">Arkavo</a>
         </div>
       </div>
+      <form className="navbar-search" onSubmit={handleSearchSubmit}>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          placeholder="Search..."
+          className="search-input"
+        />
+      </form>
       <div className="navbar-links">
         {userProfile ? (
           <div className="profile-container">
+            <FontAwesomeIcon
+              icon={faCalendar}
+              className="icon events-icon"
+              title="Events"
+              onClick={handleEventsClick}
+            />
             <FontAwesomeIcon icon={faBell} className="icon notification-icon" title="Notifications" />
             <FontAwesomeIcon
               icon={faEnvelope}
@@ -92,7 +124,7 @@ const Navbar: React.FC = () => {
               onClick={toggleDropdown}
             />
             {showDropdown && (
-              <div className="dropdown-menu">
+              <div className="dropdown-menu show">
                 <button onClick={handleViewProfile}>View Profile</button>
                 <button onClick={handleSettings}>Settings</button>
                 <button onClick={handleLogout}>Logout</button>

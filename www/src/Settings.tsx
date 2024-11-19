@@ -44,7 +44,6 @@ const Settings: React.FC<SettingsProps> = ({ userName, profilePicture, darkMode,
 
     return (
         <div>
-            <Navbar /> {/* Display Navbar at the top */}
             <div className="settings-container">
                 <h2>User Settings</h2>
 

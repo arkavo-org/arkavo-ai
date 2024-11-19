@@ -9,8 +9,10 @@ import Privacy from './Privacy'; // Import Privacy component
 import Profile from './Profile'; // Import Privacy component
 import ChatPage from './ChatPage'; // Import Privacy component
 import Settings from './Settings'; // Import Privacy component
+import VideoRoom from './VideoRoom'; // Import Privacy component
 import AIView from './AIView';
 import AICompute from './AICompute';
+import Events from './Events';
 import './App.css';
 
 const AppRoutes: React.FC = () => {
@@ -24,6 +26,8 @@ const AppRoutes: React.FC = () => {
                 <Route path="/callback" element={<Callback />} />  
                 <Route path="/profile" element={<Profile />} />  
                 <Route path="/chat" element={<ChatPage />} />  
+                <Route path="/video" element={<VideoRoom />} />  
+                <Route path="/events" element={<Events />} />  
                 <Route path="/settings" element={<Settings />} />  
                 <Route path="/aiview" element={<AIView />} />  
                 <Route path="/aicompute" element={<AICompute />} />  

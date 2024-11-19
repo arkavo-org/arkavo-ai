@@ -30,11 +30,13 @@
     font-weight: bold;
     color: #ffffff;
     text-decoration: none;
-    font-family: 'Poppins', sans-serif; /* Add a modern font */
+    font-family: 'Poppins', sans-serif;
+    /* Add a modern font */
 }
 
 .navbar-logo .home-link:hover {
-    color: #f5f5f5; /* Slightly lighter color on hover */
+    color: #f5f5f5;
+    /* Slightly lighter color on hover */
     text-decoration: underline;
 }
 
@@ -58,18 +60,21 @@
     display: flex;
     align-items: center;
     font-size: 2em;
-    gap: 15px; /* Add spacing between icons and profile picture */
+    gap: 15px;
+    /* Add spacing between icons and profile picture */
 }
 
 .profile-container {
     display: flex;
     align-items: center;
-    gap: 15px; /* Add spacing between icons and profile picture */
+    gap: 15px;
+    /* Add spacing between icons and profile picture */
 }
 
 .icon {
     font-size: 1.5em;
-    color: #ffffff; /* Default icon color */
+    color: #ffffff;
+    /* Default icon color */
     transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
     border-radius: 50%;
     padding: 8px;
@@ -80,18 +85,24 @@
 
 /* Hover effect: white background with orange drop shadow */
 .icon:hover {
-    background-color: #ffffff; /* White background on hover */
-    color: var(--arkavo-dark-orange); /* Change icon color to match theme */
+    background-color: #ffffff;
+    /* White background on hover */
+    color: var(--arkavo-dark-orange);
+    /* Change icon color to match theme */
 }
 
 /* Pressed appearance when icon is active or selected */
 .icon:active {
-    background-color: #e6e6e6; /* Light gray background when pressed */
-    transform: scale(0.95); /* Slightly smaller scale for pressed effect */
+    background-color: #e6e6e6;
+    /* Light gray background when pressed */
+    transform: scale(0.95);
+    /* Slightly smaller scale for pressed effect */
 }
 
-.notification-icon, .dm-icon {
-    margin-right: 10px; /* Space between icons if needed */
+.notification-icon,
+.dm-icon {
+    margin-right: 10px;
+    /* Space between icons if needed */
 }
 
 .profile-picture {
@@ -104,15 +115,19 @@
 
 .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: 100%; /* Places it directly below the profile picture */
     right: 0;
     background-color: white;
     border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 10px;
-    display: flex;
-    flex-direction: column;
+    display: none; /* Hidden by default */
+    z-index: 10;
+  }
+
+.profile-container .dropdown-menu.show {
+display: block; /* Display the dropdown when `showDropdown` is true */
 }
 
 .dropdown-menu button {
@@ -126,4 +141,28 @@
 
 .dropdown-menu button:hover {
     background-color: #f0f0f0;
+}
+
+
+.navbar-search {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin: 0 20px;
+}
+
+.search-input {
+    padding: 5px 10px;
+    border-radius: 20px 0 0 20px;
+    border: 1px solid #ccc;
+    outline: none;
+    width: 200px;
+}
+
+.search-button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 0 20px 20px 0;
+    cursor: pointer;
 }
