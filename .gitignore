@@ -135,4 +135,6 @@ dist
 /.idea/vcs.xml
 www.zip
 
+# ignore backend for now
+backend/*
 
