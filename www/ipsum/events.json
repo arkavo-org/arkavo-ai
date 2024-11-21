@@ -15,7 +15,9 @@
             { "name": "Julian Coy", "role": "Member" },
             { "name": "Hasan Farook", "role": "Member" },
             { "name": "Summer Romack", "role": "Member" }
-        ]
+        ],
+        "likes": 38423,
+        "comments": 852
     },
 
     {
@@ -38,7 +40,9 @@
             { "name": "Jesse Smith", "role": "Member" },
             { "name": "Tracy Moore", "role": "Member" },
             { "name": "Lisa", "role": "Member" }
-        ]
+        ],
+        "likes": 38423,
+        "comments": 852
     },
     {
         "title": "AI and Ethics Roundtable",

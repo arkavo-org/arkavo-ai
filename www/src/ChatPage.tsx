@@ -1,102 +1,77 @@
-import React, { useState, KeyboardEvent } from 'react';
+import React, { useState, useEffect, KeyboardEvent } from 'react';
 import './ChatPage.css';
-import { Sidebar } from './Sidebar.tsx';
-import { Chat } from './Chat.tsx';
+import { Sidebar } from './Sidebar';
+import { Chat } from './Chat';
+import { useKeycloak } from '@react-keycloak/web';
+import { fetchKeycloakUsers } from './keycloakUtils';
+import { sendMessageToLlamaAPI, streamLlamaResponse } from './llamaApi';
 
-function ChatPage() {
+const ChatPage: React.FC = () => {
+    const { keycloak } = useKeycloak();
     const [prompt, setPrompt] = useState('');
     const [selectedPerson, setSelectedPerson] = useState('Llama');
     const [conversations, setConversations] = useState({
         Llama: [],
-        'Sigmund Freud': [],
-        'Bill Burns CIA': [],
-        'Marlissa Smith NSA': [],
-        'Albert Einstein': [],
-        'Marie Curie': [],
-        'Ada Lovelace': [],
-        'Stephen Hawking': [],
-        'Isaac Newton': []
     });
-    const [showChat, setShowChat] = useState(false); // Controls view on mobile
+    const [people, setPeople] = useState<string[]>(['Llama']);
+    const [showChat, setShowChat] = useState(false);
 
-    const people = [
-        'Llama',
-        'Sigmund Freud',
-        'Bill Burns CIA',
-        'Marlissa Smith NSA',
-        'Albert Einstein',
-        'Marie Curie',
-        'Ada Lovelace',
-        'Stephen Hawking',
-        'Isaac Newton',
-    ];
-    
+    // Fetch Keycloak users when authenticated
+    useEffect(() => {
+        if (keycloak.authenticated) {
+            console.log("Fetching users")
+            fetchKeycloakUsers(keycloak).then((userNames) => {
+                setPeople(['Llama', ...userNames]);
+                setConversations((prevConversations) => {
+                    const newConversations = { ...prevConversations };
+                    userNames.forEach((name) => {
+                        if (!newConversations[name]) {
+                            newConversations[name] = [];
+                        }
+                    });
+                    return newConversations;
+                });
+            });
+        }
+    }, [keycloak]);
+
     const handleSubmit = async () => {
         if (!prompt.trim()) return;
 
-        setConversations(prevConversations => ({
+        // Add user's message to conversation
+        setConversations((prevConversations) => ({
             ...prevConversations,
-            [selectedPerson]: [...prevConversations[selectedPerson], `You: ${prompt}`]
+            [selectedPerson]: [...prevConversations[selectedPerson], `You: ${prompt}`],
         }));
 
         const context = conversations[selectedPerson].join('\n');
-        const jsonData = {
-            model: "llama3.2",
-            prompt: `${context}\nYou: ${prompt}`,
-        };
+        try {
+            const responseBody = await sendMessageToLlamaAPI('llama3.2', context, prompt);
+            const reader = responseBody.getReader();
+            let aiResponse = '';
 
-        setPrompt('');
-
-        const response = await fetch('/api/generate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(jsonData),
-        });
-
-        if (!response.body) {
-            console.error('No response body');
-            return;
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder('utf-8');
-        let buffer = '';
-        let aiResponse = '';
-        setConversations(prevConversations => ({
-            ...prevConversations,
-            [selectedPerson]: [...prevConversations[selectedPerson], `AI: `]
-        }));
-
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            let endOfLineIndex;
-            while ((endOfLineIndex = buffer.indexOf('\n')) >= 0) {
-                const line = buffer.slice(0, endOfLineIndex);
-                buffer = buffer.slice(endOfLineIndex + 1);
-
-                if (line.trim()) {
-                    try {
-                        const parsedLine = JSON.parse(line);
-                        aiResponse += parsedLine.response;
-
-                        setConversations(prevConversations => {
-                            const updatedConversation = [...prevConversations[selectedPerson]];
-                            updatedConversation[updatedConversation.length - 1] = `AI: ${aiResponse}`;
-                            return {
-                                ...prevConversations,
-                                [selectedPerson]: updatedConversation
-                            };
-                        });
-                    } catch (e) {
-                        console.error('Failed to parse line as JSON', e);
-                    }
+            // Stream the response
+            await streamLlamaResponse(
+                reader,
+                (data) => {
+                    aiResponse += data;
+                    setConversations((prevConversations) => {
+                        const updatedConversation = [...prevConversations[selectedPerson]];
+                        updatedConversation[updatedConversation.length - 1] = `AI: ${aiResponse}`;
+                        return {
+                            ...prevConversations,
+                            [selectedPerson]: updatedConversation,
+                        };
+                    });
+                },
+                (error) => {
+                    console.error('Error streaming Llama response:', error);
                 }
-            }
+            );
+        } catch (error) {
+            console.error('Error sending message to Llama API:', error);
+        } finally {
+            setPrompt('');
         }
     };
 
@@ -112,7 +87,6 @@ function ChatPage() {
         setShowChat(true); // Switch to chat view on mobile
     };
 
-    // Determine whether the screen size is mobile
     const isMobile = window.innerWidth <= 768;
 
     return (
@@ -151,6 +125,6 @@ function ChatPage() {
             )}
         </div>
     );
-}
+};
 
 export default ChatPage;
