@@ -1,5 +1,5 @@
 cd www
-source .env
-source .env.development 
+bash .env
+bash .env.development 
 npm install
 npm run dev
