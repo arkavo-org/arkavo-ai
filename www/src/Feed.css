@@ -2,8 +2,7 @@
 .feed-container-outer {
     padding: 0px;
     margin: 0 auto;
-    height: 100vh;
-    padding-top: 64px;
+    height: 100%;
     box-sizing: border-box;
     overflow-y: auto;
 }

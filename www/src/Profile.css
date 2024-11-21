@@ -3,9 +3,9 @@
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 8px;
-    width: 90%; /* Slightly wider container */
+    width: 100%; /* Slightly wider container */
     max-width: 800px; /* Maximum width for large screens */
-    height: 90vh; /* Allow it to take up most of the viewport height */
+    height: 100%; /* Allow it to take up most of the viewport height */
     overflow-y: auto; /* Enable vertical scrolling */
     padding: 1.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

@@ -1,54 +1,41 @@
+// src/components/Navbar.tsx
 import React, { useState, useEffect } from 'react';
-import './Navbar.css';
+import { useKeycloak } from '@react-keycloak/web';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faEnvelope, faSearch, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import './Navbar.css';
 import logo from './assets/arkavo.svg';
+import { loginAndFetchProfile, logoutAndClearProfile, UserProfile } from './keycloakUtils';
 
 const Navbar: React.FC = () => {
-  const [showNavbar, setShowNavbar] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [userProfile, setUserProfile] = useState<{ name: string; picture: string } | null>(null);
+  const { keycloak, initialized } = useKeycloak();
+  const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const navigate = useNavigate();
 
+  // Load user profile from localStorage on component mount
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setShowNavbar(currentScrollY < lastScrollY || currentScrollY === 0);
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
-
-  useEffect(() => {
-    // Load the user profile from localStorage
     const storedProfile = localStorage.getItem('userProfile');
     if (storedProfile) {
       setUserProfile(JSON.parse(storedProfile));
     }
   }, []);
 
+  // Fetch user profile when Keycloak is initialized
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!(event.target as Element).closest('.profile-container')) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    if (initialized) {
+      loginAndFetchProfile(keycloak).then((profile) => {
+        if (profile) {
+          setUserProfile(profile);
+        }
+      });
+    }
+  }, [initialized, keycloak]);
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
-  };
-
-  const handleSignIn = () => {
-    navigate('/signin');
   };
 
   const handleViewProfile = () => {
@@ -62,10 +49,9 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userProfile');
+    logoutAndClearProfile(keycloak);
     setUserProfile(null);
     setShowDropdown(false);
-    navigate('/signin');
   };
 
   const handleDMClick = () => {
@@ -86,7 +72,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className={`navbar ${showNavbar ? 'show' : 'hide'}`}>
+    <nav className="navbar">
       <div className="logo-container">
         <img src={logo} className="icon" alt="Arkavo logo" />
         <div className="navbar-logo">
@@ -104,7 +90,7 @@ const Navbar: React.FC = () => {
       </form>
       <div className="navbar-links">
         {userProfile ? (
-          <div className="profile-container">
+          <div className="profile-elements">
             <FontAwesomeIcon
               icon={faCalendar}
               className="icon events-icon"
@@ -125,7 +111,7 @@ const Navbar: React.FC = () => {
               onClick={toggleDropdown}
             />
             {showDropdown && (
-              <div className="dropdown-menu show">
+              <div className="dropdown-menu">
                 <button onClick={handleViewProfile}>View Profile</button>
                 <button onClick={handleSettings}>Settings</button>
                 <button onClick={handleLogout}>Logout</button>
@@ -133,7 +119,7 @@ const Navbar: React.FC = () => {
             )}
           </div>
         ) : (
-          <button onClick={handleSignIn}>Sign In</button>
+          <button onClick={() => loginAndFetchProfile(keycloak)}>Sign In</button>
         )}
       </div>
     </nav>
