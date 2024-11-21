@@ -1,11 +1,11 @@
-// src/Profile.tsx
 import React, { useEffect, useState } from 'react';
+import './global.css';
+import './Profile.css';
 
 const Profile: React.FC = () => {
   const [profileData, setProfileData] = useState<{ [key: string]: any } | null>(null);
 
   useEffect(() => {
-    // Retrieve and parse the user profile from localStorage
     const storedProfile = localStorage.getItem('userProfile');
     if (storedProfile) {
       setProfileData(JSON.parse(storedProfile));
@@ -16,21 +16,46 @@ const Profile: React.FC = () => {
     return <div>Loading profile...</div>;
   }
 
-  return (
-    <div className="profile-container">
-      <h2>User Profile</h2>
-      <img
-        src={profileData.picture}
-        alt="Profile"
-        style={{ width: 100, height: 100, borderRadius: '50%', marginBottom: '1rem' }}
-      />
+  const renderObject = (obj: { [key: string]: any }, depth: number = 0) => {
+    if (depth > 5) return <span>...</span>; // Limit depth to 5 levels
+
+    return (
       <ul>
-        {Object.entries(profileData).map(([key, value]) => (
+        {Object.entries(obj).map(([key, value]) => (
           <li key={key}>
-            <strong>{key}:</strong> {String(value)}
+            <strong>{key}:</strong>{' '}
+            {value && typeof value === 'object' ? (
+              Array.isArray(value) ? (
+                <ul>
+                  {value.map((item, index) => (
+                    <li key={index}>{typeof item === 'object' ? renderObject(item, depth + 1) : item || 'N/A'}</li>
+                  ))}
+                </ul>
+              ) : (
+                renderObject(value, depth + 1)
+              )
+            ) : (
+              value || 'N/A'
+            )}
           </li>
         ))}
       </ul>
+    );
+  };
+
+  return (
+    <div id="app-container">
+      <div className="profile-container">
+        <h2>User Profile</h2>
+        {profileData.picture && (
+          <img
+            src={profileData.picture}
+            alt="Profile"
+            style={{ width: 100, height: 100, borderRadius: '50%', marginBottom: '1rem' }}
+          />
+        )}
+        {renderObject(profileData)}
+      </div>
     </div>
   );
 };

@@ -2,30 +2,24 @@
 import React, { useEffect, useState } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import './SignIn.css';
 
 const SignIn: React.FC = () => {
     const { keycloak, initialized } = useKeycloak();
-    const [profilePicture, setProfilePicture] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (initialized && !keycloak.authenticated) {
             keycloak.login({
+                scope: 'openid profile email',
                 redirectUri: `${window.location.origin}/signin`
             });
         } else if (keycloak.authenticated) {
             // Fetch user profile after login
             keycloak.loadUserProfile().then(profile => {
-                const userProfile = {
-                    name: profile.firstName,
-                    picture: profile.attributes?.picture?.[0] || null
-                };
-                setProfilePicture(userProfile.picture);
 
-                // Cache profile in localStorage for Navbar use
-                localStorage.setItem('userProfile', JSON.stringify(userProfile));
+                // Cache profile in localStorage for future use
+                localStorage.setItem('userProfile', JSON.stringify(profile));
 
                 // Redirect to callback (or default page)
                 const callbackUrl = new URLSearchParams(window.location.search).get('callback');
@@ -37,7 +31,6 @@ const SignIn: React.FC = () => {
     return (
         <div className="signin-container">
             <h2>Signing In...</h2>
-            {profilePicture && <img src={profilePicture} alt="Profile" />}
         </div>
     );
 };

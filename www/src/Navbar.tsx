@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faEnvelope, faSearch, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import logo from './assets/arkavo.svg';
-import axios from 'axios';
 
 const Navbar: React.FC = () => {
   const [showNavbar, setShowNavbar] = useState(true);
@@ -13,8 +12,6 @@ const Navbar: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  const authServerUrl = import.meta.env.VITE_AUTH_SERVER_URL;
-  console.log(import.meta.env.VITE_AUTH_SERVER_URL);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,28 +25,12 @@ const Navbar: React.FC = () => {
   }, [lastScrollY]);
 
   useEffect(() => {
+    // Load the user profile from localStorage
     const storedProfile = localStorage.getItem('userProfile');
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-
     if (storedProfile) {
       setUserProfile(JSON.parse(storedProfile));
-    } else if (code) {
-      // Fetch user profile from the backend if not available in localStorage and we have a code
-      axios.get(`${authServerUrl}/api/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true
-      })
-      
-        .then(response => {
-          setUserProfile(response.data);
-          localStorage.setItem('userProfile', JSON.stringify(response.data)); // Cache in localStorage
-        })
-        .catch(error => {
-          console.error('Error fetching user profile:', error);
-        });
     }
-  }, [authServerUrl]);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -84,6 +65,7 @@ const Navbar: React.FC = () => {
     localStorage.removeItem('userProfile');
     setUserProfile(null);
     setShowDropdown(false);
+    navigate('/signin');
   };
 
   const handleDMClick = () => {
