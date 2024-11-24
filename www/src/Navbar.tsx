@@ -13,14 +13,19 @@ const Navbar: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
     if (initialized && keycloak.authenticated) {
       loginAndFetchProfile(keycloak).then((profile) => {
-        if (profile) {
-          setUserProfile(profile);
-        }
+        setUserProfile(profile);
+        setLoading(false); // Set loading to false when profile is fetched
+      }).catch((error) => {
+        console.error('Error fetching user profile:', error);
+        setLoading(false); // Set loading to false even if an error occurs
       });
+    } else {
+      setLoading(false); // Set loading to false if not authenticated
     }
   }, [initialized, keycloak]);
 
@@ -29,6 +34,10 @@ const Navbar: React.FC = () => {
     setUserProfile(null);
     setShowDropdown(false);
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Show loading state while fetching profile
+  }
 
   return (
     <nav className="navbar">

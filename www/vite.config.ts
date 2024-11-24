@@ -9,8 +9,8 @@ export default defineConfig({
   server: {
 
     https: {
-      key: fs.readFileSync('/.secrets/key.pem'),
-      cert: fs.readFileSync('/.secrets/cert.pem')
+      key: fs.readFileSync('/.secrets/localhost-key.pem'),
+      cert: fs.readFileSync('/.secrets/localhost.pem')
     },
     proxy: {
       '/api': {

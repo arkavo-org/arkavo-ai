@@ -2,12 +2,12 @@ import React, { useState, useEffect, KeyboardEvent } from 'react';
 import './ChatPage.css';
 import { Sidebar } from './Sidebar';
 import { Chat } from './Chat';
-import { useKeycloak } from '@react-keycloak/web';
-import { fetchKeycloakUsers } from './keycloakUtils';
+import { useKeycloak } from '@react-keycloak/web'; // Import useKeycloak
+import { fetchKeycloakUsers } from './orgBackendUtils'; // Import the utility function
 import { sendMessageToLlamaAPI, streamLlamaResponse } from './llamaApi';
 
 const ChatPage: React.FC = () => {
-    const { keycloak } = useKeycloak();
+    const { keycloak, initialized } = useKeycloak(); // Get keycloak instance and check if it's initialized
     const [prompt, setPrompt] = useState('');
     const [selectedPerson, setSelectedPerson] = useState('Llama');
     const [conversations, setConversations] = useState({
@@ -15,26 +15,47 @@ const ChatPage: React.FC = () => {
     });
     const [people, setPeople] = useState<string[]>(['Llama']);
     const [showChat, setShowChat] = useState(false);
+    const [loading, setLoading] = useState(true); // Loading state for users
+    const [error, setError] = useState<string | null>(null); // Error state for handling fetch errors
 
-    // Fetch Keycloak users when authenticated
+    // Use the token to fetch users
     useEffect(() => {
-        if (keycloak.authenticated) {
-            console.log("Fetching users")
-            fetchKeycloakUsers(keycloak).then((userNames) => {
-                setPeople(['Llama', ...userNames]);
-                setConversations((prevConversations) => {
-                    const newConversations = { ...prevConversations };
-                    userNames.forEach((name) => {
-                        if (!newConversations[name]) {
-                            newConversations[name] = [];
-                        }
-                    });
-                    return newConversations;
-                });
-            });
-        }
-    }, [keycloak]);
+        const fetchUsers = async () => {
+            if (initialized && keycloak.authenticated) {
+                try {
+                    // Ensure the token is valid and refresh it if needed
+                    const tokenValid = await keycloak.updateToken(30); // Refresh token if it's going to expire in 30 seconds
 
+                    const token = keycloak.token; // Get the fresh token
+                    if (!token) {
+                        throw new Error('Access token is missing');
+                    }
+
+                    console.log("Fetching users with token");
+                    const userNames = await fetchKeycloakUsers(token); // Pass the token here
+                    setPeople(['Llama', ...userNames]);
+                    setConversations((prevConversations) => {
+                        const newConversations = { ...prevConversations };
+                        userNames.forEach((name) => {
+                            if (!newConversations[name]) {
+                                newConversations[name] = [];
+                            }
+                        });
+                        return newConversations;
+                    });
+                } catch (error) {
+                    console.error('Error fetching users:', error);
+                    setError('Failed to fetch users');
+                } finally {
+                    setLoading(false); // Set loading to false after fetching
+                }
+            }
+        };
+
+        fetchUsers();
+    }, [initialized, keycloak]);
+
+    // Handle message submission
     const handleSubmit = async () => {
         if (!prompt.trim()) return;
 
@@ -88,6 +109,14 @@ const ChatPage: React.FC = () => {
     };
 
     const isMobile = window.innerWidth <= 768;
+
+    if (loading) {
+        return <div>Loading users...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div id="app-container">

@@ -63,16 +63,13 @@
     justify-content: center;
     align-items: center; /* Ensure vertical alignment */
     margin: 0 20px; /* Add spacing around the search bar */
-    max-height: 40px; /* Constrain search bar height */
 }
 
 .search-input {
-    padding: 5px 10px;
     border-radius: 20px;
     border: 1px solid #ccc;
+    align-items: center; /* Ensure vertical alignment */
     outline: none;
-    width: 200px;
-    height: 100%; /* Ensure it stays within its container */
 }
 
 .search-button {
