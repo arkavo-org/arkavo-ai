@@ -2,98 +2,71 @@ import React, { useState, useEffect, KeyboardEvent } from 'react';
 import './ChatPage.css';
 import { Sidebar } from './Sidebar';
 import { Chat } from './Chat';
-import { useKeycloak } from '@react-keycloak/web'; // Import useKeycloak
-import { fetchKeycloakUsers } from './orgBackendUtils'; // Import the utility function
-import { sendMessageToLlamaAPI, streamLlamaResponse } from './llamaApi';
+import { useKeycloak } from '@react-keycloak/web';
+import { fetchKeycloakUsers } from './orgBackendUtils';
 
 const ChatPage: React.FC = () => {
-    const { keycloak, initialized } = useKeycloak(); // Get keycloak instance and check if it's initialized
+    const { keycloak, initialized } = useKeycloak();
     const [prompt, setPrompt] = useState('');
     const [selectedPerson, setSelectedPerson] = useState('Llama');
-    const [conversations, setConversations] = useState({
+    const [conversations, setConversations] = useState<{ [key: string]: string[] }>({
         Llama: [],
     });
-    const [people, setPeople] = useState<string[]>(['Llama']);
     const [showChat, setShowChat] = useState(false);
-    const [loading, setLoading] = useState(true); // Loading state for users
-    const [error, setError] = useState<string | null>(null); // Error state for handling fetch errors
+    const [loading, setLoading] = useState(true);
+    const [people, setPeople] = useState<User[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
-    // Use the token to fetch users
     useEffect(() => {
-        const fetchUsers = async () => {
-            if (initialized && keycloak.authenticated) {
-                try {
-                    // Ensure the token is valid and refresh it if needed
-                    const tokenValid = await keycloak.updateToken(30); // Refresh token if it's going to expire in 30 seconds
-
-                    const token = keycloak.token; // Get the fresh token
-                    if (!token) {
-                        throw new Error('Access token is missing');
-                    }
-
-                    console.log("Fetching users with token");
-                    const userNames = await fetchKeycloakUsers(token); // Pass the token here
-                    setPeople(['Llama', ...userNames]);
-                    setConversations((prevConversations) => {
-                        const newConversations = { ...prevConversations };
-                        userNames.forEach((name) => {
-                            if (!newConversations[name]) {
-                                newConversations[name] = [];
-                            }
-                        });
-                        return newConversations;
+        const fetchUsers = async (token: string) => {
+            try {
+                if (!token) throw new Error('Access token is missing');
+    
+                const response = await fetchKeycloakUsers(token);
+                if (!response?.users) throw new Error('Invalid response format');
+    
+                const users = response.users;
+    
+                setPeople(users); // Directly set the fetched users
+                setConversations((prevConversations) => {
+                    const newConversations = { ...prevConversations };
+                    users.forEach((user) => {
+                        if (!newConversations[user.id]) {
+                            newConversations[user.id] = [];
+                        }
                     });
-                } catch (error) {
-                    console.error('Error fetching users:', error);
-                    setError('Failed to fetch users');
-                } finally {
-                    setLoading(false); // Set loading to false after fetching
-                }
+                    return newConversations;
+                });
+                setLoading(false);
+            } catch (err: any) {
+                console.error('Error fetching users:', err);
+                console.error('Error details:', JSON.stringify(err, null, 2));
+                setError(err?.message || 'An unknown error occurred');
+                setLoading(false);
             }
         };
-
-        fetchUsers();
-    }, [initialized, keycloak]);
+    
+        if (initialized) {
+            const token = keycloak.token || '';
+            fetchUsers(token);
+        }
+    }, [initialized, keycloak.token]);
+    
 
     // Handle message submission
     const handleSubmit = async () => {
         if (!prompt.trim()) return;
 
-        // Add user's message to conversation
         setConversations((prevConversations) => ({
             ...prevConversations,
-            [selectedPerson]: [...prevConversations[selectedPerson], `You: ${prompt}`],
+            [selectedPerson]: [
+                ...prevConversations[selectedPerson],
+                `You: ${prompt}`,
+            ],
         }));
 
         const context = conversations[selectedPerson].join('\n');
-        try {
-            const responseBody = await sendMessageToLlamaAPI('llama3.2', context, prompt);
-            const reader = responseBody.getReader();
-            let aiResponse = '';
-
-            // Stream the response
-            await streamLlamaResponse(
-                reader,
-                (data) => {
-                    aiResponse += data;
-                    setConversations((prevConversations) => {
-                        const updatedConversation = [...prevConversations[selectedPerson]];
-                        updatedConversation[updatedConversation.length - 1] = `AI: ${aiResponse}`;
-                        return {
-                            ...prevConversations,
-                            [selectedPerson]: updatedConversation,
-                        };
-                    });
-                },
-                (error) => {
-                    console.error('Error streaming Llama response:', error);
-                }
-            );
-        } catch (error) {
-            console.error('Error sending message to Llama API:', error);
-        } finally {
-            setPrompt('');
-        }
+        // Additional logic for API calls can be added here
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -105,18 +78,13 @@ const ChatPage: React.FC = () => {
 
     const handlePersonSelect = (person: string) => {
         setSelectedPerson(person);
-        setShowChat(true); // Switch to chat view on mobile
+        setShowChat(true);
     };
 
     const isMobile = window.innerWidth <= 768;
 
-    if (loading) {
-        return <div>Loading users...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
+    if (loading) return <div>Loading users...</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
         <div id="app-container">

@@ -1,6 +1,5 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import './Settings.css';
-import Navbar from './Navbar'; // Import the Navbar component
 
 interface SettingsProps {
     userName: string;
@@ -8,13 +7,19 @@ interface SettingsProps {
     darkMode: boolean;
     onUpdateName: (newName: string) => void;
     onUpdateProfilePicture: (newPicture: string) => void;
-    onToggleDarkMode: () => void;
 }
 
-const Settings: React.FC<SettingsProps> = ({ userName, profilePicture, darkMode, onUpdateName, onUpdateProfilePicture, onToggleDarkMode }) => {
+const Settings: React.FC<SettingsProps> = ({ userName, profilePicture, darkMode: initialDarkMode, onUpdateName, onUpdateProfilePicture }) => {
     const [name, setName] = useState(userName);
     const [newProfilePicture, setNewProfilePicture] = useState(profilePicture);
-    const [isDarkMode, setIsDarkMode] = useState(darkMode);
+    const [darkMode, setDarkMode] = useState(() => {
+        const storedDarkMode = localStorage.getItem('darkMode');
+        return storedDarkMode ? storedDarkMode === 'true' : initialDarkMode;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('darkMode', darkMode.toString());
+    }, [darkMode]);
 
     const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
@@ -25,9 +30,16 @@ const Settings: React.FC<SettingsProps> = ({ userName, profilePicture, darkMode,
             const file = e.target.files[0];
             const reader = new FileReader();
             reader.onloadend = () => {
-                const base64String = reader.result as string;
-                setNewProfilePicture(base64String);
-                onUpdateProfilePicture(base64String);
+                try {
+                    const base64String = reader.result as string;
+                    setNewProfilePicture(base64String);
+                    onUpdateProfilePicture(base64String);
+                } catch (error) {
+                    console.error("Failed to process the file:", error);
+                }
+            };
+            reader.onerror = () => {
+                console.error("Error reading the file.");
             };
             reader.readAsDataURL(file);
         }
@@ -37,9 +49,8 @@ const Settings: React.FC<SettingsProps> = ({ userName, profilePicture, darkMode,
         onUpdateName(name);
     };
 
-    const toggleDarkMode = () => {
-        setIsDarkMode(!isDarkMode);
-        onToggleDarkMode();
+    const handleToggleDarkMode = () => {
+        setDarkMode(!darkMode);
     };
 
     return (
@@ -49,7 +60,7 @@ const Settings: React.FC<SettingsProps> = ({ userName, profilePicture, darkMode,
 
                 <div className="settings-section">
                     <label htmlFor="name">Change Name:</label>
-                    <input 
+                    <input
                         type="text"
                         id="name"
                         value={name}
@@ -59,10 +70,11 @@ const Settings: React.FC<SettingsProps> = ({ userName, profilePicture, darkMode,
                 </div>
 
                 <div className="settings-section">
-                    <label>Profile Picture:</label>
+                    <label htmlFor="profilePicture">Profile Picture:</label>
                     <div className="profile-picture-container">
                         <img src={newProfilePicture} alt="Profile" className="profile-picture" />
-                        <input 
+                        <input
+                            id="profilePicture"
                             type="file"
                             accept="image/*"
                             onChange={handleProfilePictureChange}
@@ -72,15 +84,16 @@ const Settings: React.FC<SettingsProps> = ({ userName, profilePicture, darkMode,
 
                 <div className="settings-section">
                     <label>Dark Mode:</label>
-                    <div className="toggle-switch">
+                    <label className="toggle-switch">
                         <input
                             type="checkbox"
-                            checked={isDarkMode}
-                            onChange={toggleDarkMode}
+                            checked={darkMode}
+                            onChange={handleToggleDarkMode}
                         />
                         <span className="slider" />
-                    </div>
+                    </label>
                 </div>
+
             </div>
         </div>
     );

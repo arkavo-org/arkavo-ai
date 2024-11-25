@@ -9,12 +9,12 @@
 }
 
 /* Category-based colors */
-.feed-item.category-E {
+.feed-item.dark-mode {
     background-color: #ffffff;
 }
 
-.feed-item.category-A {
-    background-color: #ffffff;
+.feed-item.dark-mode {
+    background-color: #000000;
 }
 
 /* Hover effect */
