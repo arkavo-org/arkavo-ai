@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useKeycloak } from '@react-keycloak/web';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faEnvelope, faSearch, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faEnvelope, faSearch, faCalendar, faLockOpen, faShopLock, faUserLock, faRoadLock, faLocationPinLock } from '@fortawesome/free-solid-svg-icons';
 import './Navbar.css';
 import logo from './assets/arkavo.svg';
 import { loginAndFetchProfile, logoutAndClearProfile, UserProfile } from './keycloakUtils';
+import { faLock } from '@fortawesome/free-solid-svg-icons/faLock';
 
 const Navbar: React.FC = () => {
   const { keycloak, initialized } = useKeycloak(); // Access keycloak from ReactKeycloakProvider
@@ -60,7 +61,7 @@ const Navbar: React.FC = () => {
         {userProfile ? (
           <div className="profile-elements">
             <FontAwesomeIcon
-              icon={faCalendar}
+              icon={faLock}
               className="icon lock-icon"
               title="Events"
               onClick={() => navigate('/tdf')}

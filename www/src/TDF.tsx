@@ -1,8 +1,9 @@
-import {useEffect, useState} from "react";
-import {AuthProviders, NanoTDFDatasetClient} from "@opentdf/sdk";
+import React, { useEffect, useState } from 'react';
+import { useKeycloak } from '@react-keycloak/web';
+import { NanoTDFDatasetClient } from '@opentdf/sdk';
 
-function TDFContent() {
-  const auth = useAuth();
+const TDFContent: React.FC = () => {
+  const { keycloak } = useKeycloak();
   const [count, setCount] = useState(0);
   const [tdfClient, setTdfClient] = useState<NanoTDFDatasetClient | null>(null);
   const [encryptedData, setEncryptedData] = useState<ArrayBuffer | null>(null);
@@ -14,39 +15,36 @@ function TDFContent() {
 
   useEffect(() => {
     const initTDF = async () => {
-      if (!auth.isAuthenticated || !auth.user) return;
+      if (!keycloak.authenticated) return;
+
       try {
         setStatus({ type: 'info', message: 'Initializing TDF client...' });
-        const refreshToken = auth.user.refresh_token;
-        if (!refreshToken) {
-          throw new Error("No refresh token available");
-        }
-        const authProvider = await AuthProviders.refreshAuthProvider({
-          clientId: "localhost-arkavo-web",
-          exchange: "refresh",
-          refreshToken,
-          oidcOrigin: "https://keycloak.juliancoy.us/auth/realms/opentdf/",
-        });
+
+        // Custom auth provider using the bearer token
+        const authProvider = {
+          getToken: async () => keycloak.token || "",
+        };
 
         const client = new NanoTDFDatasetClient({
           authProvider,
-          kasEndpoint: "http://localhost:5173/kas",
+          kasEndpoint: import.meta.env.VITE_KAS_ENDPOINT, // Replace with your KAS endpoint
         });
-        // add attributes using otdfctl then add here for ABAC
-        // client.dataAttributes = ["https://juliancoy.us/attr/classification/value/secret"];
+
         setTdfClient(client);
         setStatus({ type: 'success', message: 'TDF client initialized successfully' });
       } catch (error) {
-        console.error("TDF initialization failed:", error);
+        console.error('TDF initialization failed:', error);
         setStatus({
           type: 'error',
-          message: `Failed to initialize TDF client: ${error instanceof Error ? error.message : 'Unknown error'}`
+          message: `Failed to initialize TDF client: ${
+            error instanceof Error ? error.message : 'Unknown error'
+          }`,
         });
       }
     };
 
-    initTDF().catch(console.error);
-  }, [auth.isAuthenticated, auth.user]);
+    initTDF();
+  }, [keycloak.authenticated, keycloak.token]);
 
   const handleEncrypt = async () => {
     if (!tdfClient) return;
@@ -58,10 +56,12 @@ function TDFContent() {
       setDecryptedData(null);
       setStatus({ type: 'success', message: 'Data encrypted successfully' });
     } catch (error) {
-      console.error("Encryption failed:", error);
+      console.error('Encryption failed:', error);
       setStatus({
         type: 'error',
-        message: `Encryption failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        message: `Encryption failed: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       });
     }
   };
@@ -76,42 +76,26 @@ function TDFContent() {
       setDecryptedData(decryptedText);
       setStatus({ type: 'success', message: 'Data decrypted successfully' });
     } catch (error) {
-      console.error("Decryption failed:", error);
-      let errorMessage = 'Unknown error';
-      if (error instanceof Error) {
-        // Check for specific network error related to KAS
-        if (error.message.includes('NetworkError') && error.message.includes('kas')) {
-          errorMessage = 'Failed to connect to Key Access Service (KAS). Please check if the KAS service is running and accessible.';
-        } else {
-          errorMessage = error.message;
-        }
-      }
-      setStatus({ type: 'error', message: `Decryption failed: ${errorMessage}` });
+      console.error('Decryption failed:', error);
+      setStatus({
+        type: 'error',
+        message: `Decryption failed: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      });
     }
   };
 
   const arrayBufferToHex = (buffer: ArrayBuffer): string => {
     return Array.from(new Uint8Array(buffer))
-      .map((b, i) => {
-        const hex = b.toString(16).padStart(2, "0");
-        if ((i + 1) % 20 === 0) return hex + "\n";
-        return hex + " ";
-      })
-      .join("");
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join(' ');
   };
 
-  if (auth.isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (auth.error) {
-    return <div><div>Oops... {auth.error.message}</div><div><a href="http://localhost:5173/">home</a></div></div>;
-  }
-
-  if (!auth.isAuthenticated) {
+  if (!keycloak.authenticated) {
     return (
       <div>
-        <button onClick={() => auth.signinRedirect()}>Log in</button>
+        <button onClick={() => keycloak.login()}>Log in</button>
       </div>
     );
   }
@@ -119,28 +103,28 @@ function TDFContent() {
   return (
     <div className="container">
       <div className="user-info">
-        <p>Welcome {auth.user?.profile.name}</p>
-        <button onClick={() => auth.removeUser()}>Log out</button>
+        <p>Welcome {keycloak.tokenParsed?.preferred_username}</p>
+        <button onClick={() => keycloak.logout()}>Log out</button>
       </div>
-      <h1>Secure Vite + React App + OpenTDF + OIDC</h1>
+      <h1>Secure Vite + React App + OpenTDF + Keycloak</h1>
       {status.message && (
-        <div className={`mt-4 p-4 rounded ${
-          status.type === 'error' ? 'bg-red-100 text-red-700' :
-            status.type === 'success' ? 'bg-green-100 text-green-700' :
-              'bg-blue-100 text-blue-700'
-        }`}>
+        <div
+          className={`mt-4 p-4 rounded ${
+            status.type === 'error'
+              ? 'bg-red-100 text-red-700'
+              : status.type === 'success'
+              ? 'bg-green-100 text-green-700'
+              : 'bg-blue-100 text-blue-700'
+          }`}
+        >
           {status.message}
         </div>
       )}
       <div className="card">
-        <button onClick={() => setCount((count: number) => count + 1)}>
+        <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-        <button
-          onClick={handleEncrypt}
-          disabled={!tdfClient}
-          className="ml-4"
-        >
+        <button onClick={handleEncrypt} disabled={!tdfClient} className="ml-4">
           Encrypt Count
         </button>
         <button
@@ -152,8 +136,8 @@ function TDFContent() {
         </button>
         {encryptedData && (
           <div className="mt-4">
-            <h3>Encrypted NanoTDF</h3>
-            <pre className="bg-gray-100 p-2 rounded font-mono text-sm text-left whitespace-pre-line">
+            <h3>Encrypted Data</h3>
+            <pre className="bg-gray-100 p-2 rounded font-mono text-sm">
               {arrayBufferToHex(encryptedData)}
             </pre>
           </div>
@@ -169,12 +153,6 @@ function TDFContent() {
       </div>
     </div>
   );
-}
+};
 
-function TDF() {
-  return (
-      <TDFContent />
-  );
-}
-
-export default TDF;
+export default TDFContent;
