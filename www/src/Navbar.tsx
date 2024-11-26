@@ -61,6 +61,12 @@ const Navbar: React.FC = () => {
           <div className="profile-elements">
             <FontAwesomeIcon
               icon={faCalendar}
+              className="icon lock-icon"
+              title="Events"
+              onClick={() => navigate('/tdf')}
+            />
+            <FontAwesomeIcon
+              icon={faCalendar}
               className="icon events-icon"
               title="Events"
               onClick={() => navigate('/events')}

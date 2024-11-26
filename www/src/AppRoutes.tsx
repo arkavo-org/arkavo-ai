@@ -12,6 +12,7 @@ import VideoRoom from './VideoRoom'; // Import Privacy component
 import AIView from './AIView';
 import AICompute from './AICompute';
 import Events from './Events';
+import TDF from './TDF';
 import './App.css';
 
 const AppRoutes: React.FC = () => {
@@ -27,6 +28,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="/events" element={<Events />} />  
                 <Route path="/settings" element={<Settings />} />  
                 <Route path="/navbar" element={<Navbar />} /> 
+                <Route path="/tdf" element={<TDF />} /> 
                 <Route path="/aiview" element={<AIView />} />  
                 <Route path="/aicompute" element={<AICompute />} />  
             </Routes>

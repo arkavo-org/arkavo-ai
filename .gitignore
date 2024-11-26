@@ -135,6 +135,5 @@ dist
 /.idea/vcs.xml
 www.zip
 
-# ignore backend for now
-backend/*
-
+package*
+backend/keycloak/admin_scripts/keycloak-24.0.5.zip
