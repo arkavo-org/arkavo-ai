@@ -36,7 +36,10 @@ func main() {
 
 	// Enable CORS with default settings
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://localhost:5173"}, // Frontend URL
+		AllowOrigins: []string{
+			"https://localhost:5173",
+			"https://arkavo.ai",
+		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Authorization", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -52,7 +55,7 @@ func main() {
 	}
 
 	// Use HTTPS with the generated certificate
-	router.RunTLS(":"+port, os.Getenv("ORG_CERT_LOCATION"), os.Getenv("ORG_KEY_LOCATION"))
+	router.RunTLS("0.0.0.0:"+port, os.Getenv("ORG_CERT_LOCATION"), os.Getenv("ORG_KEY_LOCATION"))
 }
 
 // initializeClient sets up the GoCloak client
