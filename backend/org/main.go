@@ -54,8 +54,8 @@ func main() {
 		port = "8085"
 	}
 
-	// Use HTTPS with the generated certificate
-	router.RunTLS("0.0.0.0:"+port, os.Getenv("ORG_CERT_LOCATION"), os.Getenv("ORG_KEY_LOCATION"))
+	// Use HTTP and bind to localhost
+	router.Run("127.0.0.1:" + port)
 }
 
 // initializeClient sets up the GoCloak client

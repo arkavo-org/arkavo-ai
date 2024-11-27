@@ -1,0 +1,16 @@
+services:
+  app:
+    container_name: "frontend${FRONTEND_PORT:-5173}"
+    image: node:22
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173" # Use the FRONTEND_PORT env var, default to 5173 if not set
+    command: >
+      sh -c "
+      npm install &&
+      npm run dev"
+    environment:
+      - NODE_ENV=development
+

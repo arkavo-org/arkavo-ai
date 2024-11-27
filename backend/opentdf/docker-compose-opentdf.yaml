@@ -4,21 +4,22 @@ networks:
 services:
   opentdf:
     container_name: opentdf
-    image: opentdf:latest
+    image: julianfl0w/opentdf:1.0
     restart: always
     environment:
-      KEYCLOAK_BASE_URL: https://keycloak.juliancoy.us
+      KEYCLOAK_BASE_URL: ${KEYCLOAK_SERVER_URL}
     ports:
       - "8080:8080"
     command: start
     volumes:
       - ./opentdf-dev.yaml:/app/opentdf.yaml
-      - ./juliancoy.us-cert.pem:/app/kas-cert.pem
-      - ./juliancoy.us-private.pem:/app/kas-ec-cert.pem
+      - ${PWD}:/keys
+      - ./kas-cert.pem:/app/kas-cert.pem
+      - ./kas-ec-cert.pem:/app/kas-ec-cert.pem
       - ./kas-private.pem:/app/kas-private.pem
       - ./kas-ec-private.pem:/app/kas-ec-private.pem
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf https://keycloak.juliancoy.us || exit 1"]
+      test: ["CMD-SHELL", "curl -sf ${KEYCLOAK_SERVER_URL} || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
