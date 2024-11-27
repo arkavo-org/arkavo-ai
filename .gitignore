@@ -137,3 +137,4 @@ www.zip
 
 package*
 backend/keycloak/admin_scripts/keycloak-24.0.5.zip
+.env.secret

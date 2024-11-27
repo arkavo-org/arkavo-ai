@@ -9,9 +9,9 @@ digraph Architecture {
     ReactFrontend [label="React-Frontend"];
 
     // Connections with colors
-    OpenTDF -> Keycloak [label="Authenticates with" color=red penwidth=2];
-    OrgBackend -> Keycloak [label="Authenticates with" color=red penwidth=2];
+    OpenTDF -> Keycloak [label="Authenticates with" color=green penwidth=2];
+    OrgBackend -> Keycloak [label="Authenticates with" color=green penwidth=2];
     ReactFrontend -> Keycloak [label="Authenticates with" color=green penwidth=2];
-    ReactFrontend -> OpenTDF [label="Interacts with" color=red penwidth=2];
+    ReactFrontend -> OpenTDF [label="Interacts with" color=green penwidth=2];
     ReactFrontend -> OrgBackend [label="Interacts with" color=green penwidth=2];
 }

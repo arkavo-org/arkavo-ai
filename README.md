@@ -1,5 +1,16 @@
-# arkavo-ai
-AI bridge to Arkavo social network
+# Arkavo 
+An Open-Source Web Forum
+
+## System Diagram
+![Architecture](./diagrams/architecture.png)
 
 ## Development
-./start.sh
+```bash
+./start_dev.sh
+```
+
+
+## Production
+```bash
+./start_prod.sh
+```
