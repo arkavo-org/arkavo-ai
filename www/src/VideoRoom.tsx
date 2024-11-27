@@ -2,23 +2,26 @@ import React, { useEffect } from 'react';
 import $ from 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'toastr/build/toastr.min.css';
-
-// Declare Janus as a global to work with the Janus SDK from mvideoroom.js
-declare const Janus: any;
 import adapter from 'webrtc-adapter';
 
 import { server, iceServers } from './settings';
 
+// Extend the window object for the adapter
+declare global {
+    interface Window {
+        adapter: any;
+    }
+}
+
+// Declare Janus globally
+declare const Janus: any;
+
 const VideoRoom: React.FC = () => {
     useEffect(() => {
         const loadScripts = async () => {
-            // Assign adapter to the global scope to ensure it's available to Janus
             window.adapter = adapter;
-            // Load janus.js first, then settings.js and mvideoroom.js
             await import('./janus.js');
-            await Promise.all([
-                import('./mvideoroom.js'),
-            ]);
+            await Promise.all([import('./mvideoroom.js')]);
 
             Janus.init({
                 debug: "all",
@@ -26,23 +29,22 @@ const VideoRoom: React.FC = () => {
             });
         };
 
-
         const startJanus = () => {
-            let janus = null;
-            let sfutest = null;
+            let janus: any = null;
+            //let sfutest: any = null;
             let opaqueId = "videoroomtest-" + Janus.randomString(12);
 
             Janus.init({
-                debug: "all", callback: function () {
-                    $('#start').one('click', function () {
+                debug: "all",
+                callback: function () {
+                    $('#start').one('click', function (this: HTMLElement) {
                         $(this).attr('disabled', true).unbind('click');
 
                         if (!Janus.isWebrtcSupported()) {
-                            alert("No WebRTC support... ");
+                            alert("No WebRTC support...");
                             return;
                         }
 
-                        // Create session
                         janus = new Janus({
                             server,
                             iceServers,
@@ -50,11 +52,8 @@ const VideoRoom: React.FC = () => {
                                 janus.attach({
                                     plugin: "janus.plugin.videoroom",
                                     opaqueId,
-                                    success: function (pluginHandle) {
+                                    success: function (pluginHandle: any) {
                                         sfutest = pluginHandle;
-                                        Janus.log("Plugin attached! (" + sfutest.getPlugin() + ", id=" + sfutest.getId() + ")");
-                                        Janus.log("This is a publisher/manager");
-
                                         $('#videojoin').removeClass('hide');
                                         $('#registernow').removeClass('hide');
                                         $('#register').click(registerUsername);
@@ -74,19 +73,16 @@ const VideoRoom: React.FC = () => {
                             },
                         });
                     });
-                }
+                },
             });
         };
 
-        // Register a username function
         const registerUsername = () => {
             const username = $('#username').val();
             if (!username) {
                 alert("Please enter a username");
                 return;
             }
-            // Join room logic here
-            // Example: sfutest.send({ message: { request: "join", room: myroom, ptype: "publisher", display: username }});
         };
 
         loadScripts();

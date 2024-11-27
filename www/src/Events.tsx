@@ -7,7 +7,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { DateSelectArg, EventApi } from '@fullcalendar/core';
+import {  EventApi } from '@fullcalendar/core';
 
 interface EventData {
     id: string;

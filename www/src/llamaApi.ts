@@ -31,29 +31,25 @@ export const streamLlamaResponse = async (
     const decoder = new TextDecoder('utf-8');
     let buffer = '';
 
-    try {
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
+    while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
 
-            buffer += decoder.decode(value, { stream: true });
-            let endOfLineIndex;
+        buffer += decoder.decode(value, { stream: true });
+        let endOfLineIndex;
 
-            while ((endOfLineIndex = buffer.indexOf('\n')) >= 0) {
-                const line = buffer.slice(0, endOfLineIndex);
-                buffer = buffer.slice(endOfLineIndex + 1);
+        while ((endOfLineIndex = buffer.indexOf('\n')) >= 0) {
+            const line = buffer.slice(0, endOfLineIndex);
+            buffer = buffer.slice(endOfLineIndex + 1);
 
-                if (line.trim()) {
-                    try {
-                        const parsedLine = JSON.parse(line);
-                        onData(parsedLine.response);
-                    } catch (e) {
-                        console.error('Error parsing Llama response line:', e);
-                    }
+            if (line.trim()) {
+                try {
+                    const parsedLine = JSON.parse(line);
+                    onData(parsedLine.response);
+                } catch (e) {
+                    console.error('Error parsing Llama response line:', e);
                 }
             }
         }
-    } catch (error) {
-        onError(error);
     }
 };

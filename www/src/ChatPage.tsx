@@ -65,7 +65,7 @@ const ChatPage: React.FC = () => {
             ],
         }));
 
-        const context = conversations[selectedPerson].join('\n');
+        //const context = conversations[selectedPerson].join('\n');
         // Additional logic for API calls can be added here
     };
 

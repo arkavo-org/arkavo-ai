@@ -3,7 +3,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import './Feed.css';
 
-import Navbar from './Navbar';
 import FeedItem from './FeedItem';
 
 interface FeedItemData {

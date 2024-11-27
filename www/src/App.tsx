@@ -48,3 +48,4 @@ const App: React.FC = () => {
 
 // Render the App
 createRoot(document.getElementById('root')!).render(<App />);
+export default App;

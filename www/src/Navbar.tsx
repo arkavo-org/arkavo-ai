@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useKeycloak } from '@react-keycloak/web';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faEnvelope, faSearch, faCalendar, faLockOpen, faShopLock, faUserLock, faRoadLock, faLocationPinLock } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faEnvelope, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import './Navbar.css';
 import logo from './assets/arkavo.svg';
 import { loginAndFetchProfile, logoutAndClearProfile, UserProfile } from './keycloakUtils';
