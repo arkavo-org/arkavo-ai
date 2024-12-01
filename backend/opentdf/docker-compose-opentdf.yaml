@@ -1,6 +1,7 @@
 networks:
   default:
-    name: opentdf_platform
+    name: arkavo
+    external: true
 services:
   opentdf:
     container_name: opentdf

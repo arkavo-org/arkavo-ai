@@ -1,6 +1,6 @@
 networks:
   default:
-    name: opentdf_platform
+    name: arkavo
 services:
   keycloakdb:
     image: postgres:15-alpine
