@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../../.secrets"
+		},
+		{
+			"path": "../platform"
+		}
+	],
+	"settings": {}
+}
