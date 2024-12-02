@@ -1,12 +1,15 @@
+networks:
+  default:
+    name: arkavo
 services:
   app:
-    container_name: "frontend${FRONTEND_PORT:-5173}"
+    container_name: "frontend_${CONTAINER_NAME}"
     image: node:22
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
     ports:
-      - "${FRONTEND_PORT:-5173}:5173" # Use the FRONTEND_PORT env var, default to 5173 if not set
+      - "${FRONTEND_PORT}:5173" # Use the FRONTEND_PORT env var, default to 5173 if not set
     command: >
       sh -c "
       npm install &&

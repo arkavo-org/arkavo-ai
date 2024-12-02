@@ -1,6 +1,6 @@
 networks:
   default:
-    name: opentdf_platform
+    name: arkavo
 services:
   keycloak:
     container_name: keycloak
