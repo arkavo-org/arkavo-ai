@@ -11,5 +11,3 @@ if [ "$BRANCH" == "dev" ]; then
 else
   export FRONTEND_PORT=3000
 fi
-
-export COMPOSE_PROJECT_NAME=${FRONTEND_PORT}3001

@@ -15,6 +15,10 @@ docker run -d \
   --rm \
   -v "$(pwd):/usr/src/app" \
   -w /usr/src/app \
+<<<<<<< HEAD
+=======
+  -p "${FRONTEND_PORT}:5173" \
+>>>>>>> 2fb6964c571af9b0ba29e7894ad0e18775d447aa
   -e NODE_ENV=development \
   -e VITE_KEYCLOAK_SERVER_URL="${VITE_KEYCLOAK_SERVER_URL}" \
   -e VITE_KEYCLOAK_REALM="${VITE_KEYCLOAK_REALM}" \
@@ -24,3 +28,7 @@ docker run -d \
   node:22 \
   sh -c "npm install && npm run dev"
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2fb6964c571af9b0ba29e7894ad0e18775d447aa
