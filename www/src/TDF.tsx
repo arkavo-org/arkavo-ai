@@ -20,9 +20,32 @@ const TDFContent: React.FC = () => {
       try {
         setStatus({ type: 'info', message: 'Initializing TDF client...' });
 
-        // Custom auth provider using the bearer token
+        // Custom auth provider with necessary methods
         const authProvider = {
           getToken: async () => keycloak.token || "",
+          updateClientPublicKey: async (publicKey: string) => {
+            console.log('Updating client public key:', publicKey);
+            try {
+              const response = await fetch(
+                `${import.meta.env.VITE_KAS_ENDPOINT}/updatePublicKey`, // Replace with your endpoint
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${keycloak.token}`,
+                  },
+                  body: JSON.stringify({ publicKey }),
+                }
+              );
+
+              if (!response.ok) {
+                throw new Error(`Failed to update client public key: ${response.statusText}`);
+              }
+            } catch (error) {
+              console.error('Error updating client public key:', error);
+              throw error;
+            }
+          },
         };
 
         const client = new NanoTDFDatasetClient({
@@ -156,4 +179,3 @@ const TDFContent: React.FC = () => {
 };
 
 export default TDFContent;
-  

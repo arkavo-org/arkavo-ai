@@ -13,10 +13,10 @@ docker network inspect arkavo >/dev/null 2>&1 || docker network create arkavo
 docker run -d \
   --name arkavo-dev-nginx \
   --network arkavo \
-  --rm \
+  --restart always \
   -p 3001:443 \
   -v "$(pwd)/nginx.conf:/etc/nginx/nginx.conf" \
-  -v "/etc/letsencrypt/live/arkavo.org/fullchain.pem:/keys/fullchain.pem" \
-  -v "/etc/letsencrypt/live/arkavo.org/privkey.pem:/keys/privkey.pem" \
+  -v "./keys/privkey.pem:/keys/privkey.pem" \
+  -v "./keys/fullchain.pem:/keys/fullchain.pem" \
   nginx
 

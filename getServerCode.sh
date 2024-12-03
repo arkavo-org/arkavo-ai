@@ -2,7 +2,7 @@
 
 # Step 1: Zip the folder on the host server, excluding node_modules and .git
 echo "Step 1: Zipping the folder on the host server (excluding node_modules and .git)..."
-ssh -i $PEM_FILE $SERVER_USER@$SERVER_HOST "zip -r $ZIP_FILE $REMOTE_FOLDER --exclude '*/node_modules/*' --exclude '*/.git/*'"
+ssh -i $PEM_FILE $SERVER_USER@$SERVER_HOST "zip -r $ZIP_FILE $REMOTE_FOLDER --exclude '*/node_modules/*'"
 if [ $? -eq 0 ]; then
     echo "Zipping completed successfully."
 else
